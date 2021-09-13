@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled3/Services/FileService.dart';
 import 'Setting.dart';
 import 'custom_animated_bottom_bar.dart';
 
@@ -8,43 +9,62 @@ class Notes extends StatefulWidget {
 }
 
 class NotesState extends State<Notes> {
+
+  FileService fileService = FileService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-
-            onPressed: () {
-              Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Setting()),);
-            },
-            icon: Icon(
-              Icons.settings,
-              color: Colors.white,
-              size: 35,
-            )),
-        toolbarHeight: 90,
-        title: Text('Notes',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30,color: Colors.black)),
-        backgroundColor: Color(0xFF33ACE3),
-        centerTitle: true,
-        actions: <Widget>[
-          Row(
-            children: <Widget>[
-              IconButton(
-                  onPressed: () {
-
-                  },
-                  icon: Icon(
-                    Icons.event_note_sharp,
-                    color: Colors.white,
-                    size: 35,
-                  ))
-            ],
-          )
-        ],
+      body: FutureBuilder<List<Object>>(
+        future: fileService.getLocalNotes(5), // a previously-obtained Future<String> or null
+        builder: (BuildContext context, AsyncSnapshot<List<Object>> snapshot) {
+          List<Widget> children;
+          if (snapshot.hasData) {
+            children = <Widget>[
+              const Icon(
+                Icons.check_circle_outline,
+                color: Colors.green,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text('Result: ${snapshot.data}'),
+              )
+            ];
+          } else if (snapshot.hasError) {
+            children = <Widget>[
+              const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 60,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text('Error: ${snapshot.error}'),
+              )
+            ];
+          } else {
+            children = const <Widget>[
+              SizedBox(
+                child: CircularProgressIndicator(),
+                width: 60,
+                height: 60,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Text('Awaiting result...'),
+              )
+            ];
+          }
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: children,
+            ),
+          );
+        },
       ),
-      bottomNavigationBar: BottomBar(1),
     );
   }
 }

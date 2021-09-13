@@ -4,6 +4,8 @@ import 'package:highlight_text/highlight_text.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'dart:collection';
 
+import 'FileService.dart';
+
 
 
 class Speech extends StatefulWidget {
@@ -16,6 +18,9 @@ class _SpeechState extends State<Speech> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
   String _text = '';
+  FileService fileService = FileService();
+
+
 
   @override
   void initState() {
@@ -126,6 +131,7 @@ class _SpeechState extends State<Speech> {
         _speech.listen(
           onResult: (val) => setState(() {
             _text = val.recognizedWords;
+            fileService.writeFile(val.recognizedWords);
           }),
         );
       }
